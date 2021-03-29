@@ -122,9 +122,40 @@ public class CompactPrefixTree implements Dictionary {
 
         // A node whose prefix is the same as the word you are looking for,
         // with the valid bit set to false. Set this bit to true, and return the tree.
+        if (node.prefix.equals(s)) {
+            if (!node.isWord) {
+                node.isWord = true;
+                return node;
+            }
+            //The word is already in the tree! Return the tree unchanged.
+            if (node.isWord) {
+                return node;
+            }
+
+            //A node whose prefix is not the prefix of the word you are looking for.
+            // This is the hard case. Example: if you were inserting "hamster"
+            // into a node whose prefix was "hamburger". You need to:
+
+            // Create a new node.
+            // The prefix stored in this node is the longest common prefix of the word you are inserting
+            // and the prefix stored at the original root.
+            //
+            // Thus, if you were inserting "hamster" into a node whose prefix was "hamburger",
+            // then the prefix of this new node would be "ham"
+        }
 
 
         return null; // don't forget to change it
+    }
+
+    public String longestCommonPrefix (String s, Node n) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) == n.prefix.charAt(i)) {
+                sb.append(s.charAt(i));
+            }
+        }
+        return sb.toString();
     }
 
 
@@ -201,12 +232,15 @@ public class CompactPrefixTree implements Dictionary {
         // if prefix starts with the prefix stored at the root,
         // remove prefix from P
         // recursively check the subtree
+
+        // String prefix: cart
+        // Node ca
+        // if prefix of the root starts with p, return true
+        // Make sure you DO NOT iterate over the children but to search in only one child subtree
         if (prefix.toLowerCase().startsWith(node.prefix)) {
             return checkPrefix(getSuffix(prefix, node), node);
         }
-
-        // Make sure you DO NOT iterate over the children but to search in only one child subtree
-        return false; //TODO change?
+        return false;
     }
 
 
