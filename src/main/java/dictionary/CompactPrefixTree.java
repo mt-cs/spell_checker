@@ -22,7 +22,7 @@ public class CompactPrefixTree implements Dictionary {
         // FILL IN CODE:
         // Read each word from the file, add it to the tree
 
-        // TODO: do insert first
+
     }
 
     /** Adds a given word to the dictionary.
@@ -105,14 +105,23 @@ public class CompactPrefixTree implements Dictionary {
     // ---------- Private helper methods ---------------
 
     /**
-     *  A private add method that adds a given string to the tree
+     * A private add method that adds a given string to the tree
      * @param s the string to add
      * @param node the root of a tree where we want to add a new string
 
      * @return a reference to the root of the tree that contains s
      */
     private Node add(String s, Node node) {
-        // FILL IN CODE
+        // TODO: do insert first
+        // Base case 1: empty tree
+        // create a new node whose prefix is the word s and isWord true, return this node
+        if (node == null) {
+            Node root = new Node(true, s);
+            return root;
+        }
+
+        // A node whose prefix is the same as the word you are looking for,
+        // with the valid bit set to false. Set this bit to true, and return the tree.
 
 
         return null; // don't forget to change it
@@ -127,8 +136,27 @@ public class CompactPrefixTree implements Dictionary {
      */
     private boolean check(String s, Node node) {
         // FILL IN CODE
+        // Base Cases: If the tree is empty, return false
+        if (node == null) {
+            return false;
+        }
 
-        return false; // don't forget to change it
+        // If word does not start with the prefix stored at the root, return false
+        if (!s.toLowerCase().startsWith(node.prefix)) {
+            return false;
+        } else if (s.toLowerCase().startsWith(node.prefix)){ // word = prefix stored at the root
+            if (!node.isWord) {
+                return false;
+            } else {
+                return true; // the word is in the tree
+            }
+        }
+        //Recursive Case:
+        //the prefix stored at the root of the tree is a proper prefix of the word we are looking for
+        String subS = getSuffix(s.toLowerCase(), node);
+//        char first = subS.charAt(0);
+//        int index = first - 'a';
+        return checkPrefix(subS, node.children[getIndex(subS)]);
     }
 
     /**
@@ -144,6 +172,15 @@ public class CompactPrefixTree implements Dictionary {
     }
 
     /**
+     * A helper method to get the index from substring
+     * @param subS sub String
+     * @return integer index
+     */
+    private int getIndex (String subS) {
+        return subS.charAt(0) - 'a';
+    }
+
+    /**
      * A private recursive method to check whether a given prefix is in the tree
      *
      * @param prefix the prefix
@@ -151,48 +188,28 @@ public class CompactPrefixTree implements Dictionary {
      * @return true if the prefix is in the dictionary, false otherwise
      */
     private boolean checkPrefix(String prefix, Node node) {
-        // FILL IN CODE
-        // * Base Cases:
-        // * • If the tree is empty, return false
+        // BASE CASE
+        // If tree is null, return false
         if (node == null) {
             return false;
         }
-
-        // • If word does not start with the prefix stored at the root, return false
-        if (!prefix.toLowerCase().startsWith(node.prefix)) {
-            return false;
-        } else if (prefix.toLowerCase().startsWith(node.prefix)){ // word = prefix stored at the root
-            if (!node.isWord) {
-                return false;
-            } else {
-                return true; // the word is in the tree
-            }
+        // If prefix of the root starts with P, return true
+        if (node.prefix.startsWith(prefix.toLowerCase())) {
+            return true;
+        }
+        // RECURSIVE CASE
+        // if prefix starts with the prefix stored at the root,
+        // remove prefix from P
+        // recursively check the subtree
+        if (prefix.toLowerCase().startsWith(node.prefix)) {
+            return checkPrefix(getSuffix(prefix, node), node);
         }
 
-        // * Recursive Case:
-        //the prefix stored at the root of the tree
-        //         * is a proper prefix of the word we are looking for
-        String new_prefix = getSuffix(prefix.toLowerCase(), node);
-        char first = new_prefix.charAt(0);
-        // get index of node children using ASCII
-        int index = first - 'a';
-        checkPrefix(new_prefix, node.children[index]);
-
-        /**
-
-         * If none of the base cases hold (that is, the prefix stored at the root of the tree
-         * is a proper prefix of the word we are looking for) then:
-         *
-         *
-         * • The word is in the tree if and only
-         * if suffix in the tree corresponding to the child labeled with the first letter of suffix.
-         * In the above example, if we are looking for "green" in a root that contains
-         * the prefix "gre", then "green" is in this tree
-         * if and only if "en" is in the 'e'subtree of this tree.
-         */
-
-        return false; // don't forget to change it
+        // Make sure you DO NOT iterate over the children but to search in only one child subtree
+        return false; //TODO change?
     }
+
+
 
     // You might want to create a private recursive helper method for toString
     // that takes the node and the number of indentations, and returns the tree  (printed with indentations) in a string.
@@ -212,6 +229,16 @@ public class CompactPrefixTree implements Dictionary {
             isWord = false;
             prefix = "";
             children = new Node[26]; // initialize the array of children
+        }
+
+        /**
+         * A helper constructor to create a new node with boolean and string value
+         * @param valid boolean isWord valid
+         * @param pref String prefix
+         */
+        Node(boolean valid, String pref) {
+            isWord = valid;
+            prefix = pref;
         }
 
         // FILL IN CODE: Add other methods to class Node as needed
