@@ -1,5 +1,7 @@
 package dictionary;
 
+import java.util.Locale;
+
 /** CompactPrefixTree class, implements Dictionary ADT and
  *  several additional methods. Can be used as a spell checker.
  *  Fill in code and feel free to add additional methods as needed.
@@ -20,7 +22,7 @@ public class CompactPrefixTree implements Dictionary {
         // FILL IN CODE:
         // Read each word from the file, add it to the tree
 
-
+        // TODO: do insert first
     }
 
     /** Adds a given word to the dictionary.
@@ -130,6 +132,18 @@ public class CompactPrefixTree implements Dictionary {
     }
 
     /**
+     * Get suffix, the portion of the word that is not part of the prefix stored at the root.
+     * So, if the word we are looking for is "green",
+     * and the prefix stored at the root of the tree is "gre", then suffix would be "en"
+     * @param pref String to be searched and suffixed
+     * @param node node of the tree
+     * @return suffix of the input string
+     */
+    private String getSuffix (String pref, Node node) {
+        return pref.substring(node.prefix.length());
+    }
+
+    /**
      * A private recursive method to check whether a given prefix is in the tree
      *
      * @param prefix the prefix
@@ -138,6 +152,44 @@ public class CompactPrefixTree implements Dictionary {
      */
     private boolean checkPrefix(String prefix, Node node) {
         // FILL IN CODE
+        // * Base Cases:
+        // * • If the tree is empty, return false
+        if (node == null) {
+            return false;
+        }
+
+        // • If word does not start with the prefix stored at the root, return false
+        if (!prefix.toLowerCase().startsWith(node.prefix)) {
+            return false;
+        } else if (prefix.toLowerCase().startsWith(node.prefix)){ // word = prefix stored at the root
+            if (!node.isWord) {
+                return false;
+            } else {
+                return true; // the word is in the tree
+            }
+        }
+
+        // * Recursive Case:
+        //the prefix stored at the root of the tree
+        //         * is a proper prefix of the word we are looking for
+        String new_prefix = getSuffix(prefix.toLowerCase(), node);
+        char first = new_prefix.charAt(0);
+        // get index of node children using ASCII
+        int index = first - 'a';
+        checkPrefix(new_prefix, node.children[index]);
+
+        /**
+
+         * If none of the base cases hold (that is, the prefix stored at the root of the tree
+         * is a proper prefix of the word we are looking for) then:
+         *
+         *
+         * • The word is in the tree if and only
+         * if suffix in the tree corresponding to the child labeled with the first letter of suffix.
+         * In the above example, if we are looking for "green" in a root that contains
+         * the prefix "gre", then "green" is in this tree
+         * if and only if "en" is in the 'e'subtree of this tree.
+         */
 
         return false; // don't forget to change it
     }
@@ -151,7 +203,7 @@ public class CompactPrefixTree implements Dictionary {
 
     // --------- Private class Node ------------
     // Represents a node in a compact prefix tree
-    private class Node {
+    class Node {
         String prefix; // prefix stored in the node
         Node children[]; // array of children (26 children)
         boolean isWord; // true if by concatenating all prefixes on the path from the root to this node, we get a valid word
