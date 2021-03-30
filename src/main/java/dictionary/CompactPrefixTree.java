@@ -139,9 +139,24 @@ public class CompactPrefixTree implements Dictionary {
             // Create a new node.
             // The prefix stored in this node is the longest common prefix of the word you are inserting
             // and the prefix stored at the original root.
-            //
-            // Thus, if you were inserting "hamster" into a node whose prefix was "hamburger",
-            // then the prefix of this new node would be "ham"
+            Node newNode = new Node();
+            newNode.prefix = longestCommonPrefix(s, node);
+
+            // Let suffix and suffixWord be the suffix of the original prefix
+            // and the suffix of the word you are adding,
+            // after extracting the common prefix.
+            String suffix = getSuffix(node.prefix, newNode);
+            String suffixWord = getSuffix(s, newNode);
+
+            // Set the prefix of the original tree to suffix,
+            // and set the child of the new node corresponding
+            // to the first letter of suffix to the original tree
+            node.prefix = suffix;
+            newNode.children[getIndex(suffix)] = node;
+
+            // Recursively insert suffixWord into the
+            // appropriate child of the new node o
+            // Return the new node
         }
 
 
