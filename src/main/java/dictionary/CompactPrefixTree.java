@@ -121,53 +121,64 @@ public class CompactPrefixTree implements Dictionary {
         }
 
         // A node whose prefix is the same as the word you are looking for,
-        // with the valid bit set to false. Set this bit to true, and return the tree.
         if (node.prefix.equals(s)) {
+            // with the valid bit set to false. Set this bit to true, and return the tree.
             if (!node.isWord) {
                 node.isWord = true;
-                return node;
             }
-            //The word is already in the tree! Return the tree unchanged.
-            if (node.isWord) {
-                return node;
-            }
-
-            //A node whose prefix is not the prefix of the word you are looking for.
-            // This is the hard case. Example: if you were inserting "hamster"
-            // into a node whose prefix was "hamburger". You need to:
-
-            // Create a new node.
-            // The prefix stored in this node is the longest common prefix of the word you are inserting
-            // and the prefix stored at the original root.
-            Node newNode = new Node();
-            newNode.prefix = longestCommonPrefix(s, node);
-
-            // Let suffix and suffixWord be the suffix of the original prefix
-            // and the suffix of the word you are adding,
-            // after extracting the common prefix.
-            String suffix = getSuffix(node.prefix, newNode);
-            String suffixWord = getSuffix(s, newNode);
-
-            // Set the prefix of the original tree to suffix,
-            // and set the child of the new node corresponding
-            // to the first letter of suffix to the original tree
-            node.prefix = suffix;
-            newNode.children[getIndex(suffix)] = node;
-
-            // Recursively insert suffixWord into the
-            // appropriate child of the new node o
-            // Return the new node
+            //with the valid bit set to false. The word is already in the tree! Return the tree unchanged.
+            return node;
         }
+        //A node whose prefix is not the prefix of the word you are looking for.
+        // This is the hard case. Example: if you were inserting "hamster"
+        // into a node whose prefix was "hamburger". You need to:
 
+        // Create a new node.
+        // The prefix stored in this node is the longest common prefix of the word you are inserting
+        // and the prefix stored at the original root.
+        // TODO: Don't create a new node everytime
+        // if  LCP is == node.prefix and the suffix is empty
+        // ap and apple
+        // we don't need to create a new node
+        // isWord set to true
+        Node newNode = new Node();
+        newNode.prefix = longestCommonPrefix(s, node);
 
-        return null; // don't forget to change it
+        // Let suffix and suffixWord be the suffix of the original prefix
+        // and the suffix of the word you are adding,
+        // after extracting the common prefix.
+        String suffix = getSuffix(newNode.prefix, newNode.prefix.length());
+        String suffixWord = getSuffix(s, newNode.prefix.length());
+
+        // Set the prefix of the original tree to suffix,
+        // and set the child of the new node corresponding
+        // to the first letter of suffix to the original tree
+        node.prefix = suffix;
+        newNode.children[getIndex(String.valueOf(suffix.charAt(0)))] = node;
+
+        // Recursively insert suffixWord into the
+        // appropriate child of the new node o
+        // Return the new node
+
+        newNode.children[getIndex(String.valueOf(suffixWord.charAt(0)))] =
+                add(suffixWord, newNode.children[getIndex(String.valueOf(suffixWord.charAt(0)))]);
+        // set the child of the newNode to return value of add
+        return newNode;
     }
 
+    // TODO: test
+
     public String longestCommonPrefix (String s, Node n) {
+        if (n.prefix.equals("")) {
+            return "";
+        }
+
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
             if (s.charAt(i) == n.prefix.charAt(i)) {
                 sb.append(s.charAt(i));
+            } else {
+                break;
             }
         }
         return sb.toString();
@@ -199,7 +210,7 @@ public class CompactPrefixTree implements Dictionary {
         }
         //Recursive Case:
         //the prefix stored at the root of the tree is a proper prefix of the word we are looking for
-        String subS = getSuffix(s.toLowerCase(), node);
+        String subS = getSuffix(s.toLowerCase(), node.prefix.length());
 //        char first = subS.charAt(0);
 //        int index = first - 'a';
         return checkPrefix(subS, node.children[getIndex(subS)]);
@@ -210,11 +221,11 @@ public class CompactPrefixTree implements Dictionary {
      * So, if the word we are looking for is "green",
      * and the prefix stored at the root of the tree is "gre", then suffix would be "en"
      * @param pref String to be searched and suffixed
-     * @param node node of the tree
+     * @param idx int beginning index of the substring
      * @return suffix of the input string
      */
-    private String getSuffix (String pref, Node node) {
-        return pref.substring(node.prefix.length());
+    public String getSuffix (String pref, int idx) {
+        return pref.substring(idx);
     }
 
     /**
@@ -253,7 +264,7 @@ public class CompactPrefixTree implements Dictionary {
         // if prefix of the root starts with p, return true
         // Make sure you DO NOT iterate over the children but to search in only one child subtree
         if (prefix.toLowerCase().startsWith(node.prefix)) {
-            return checkPrefix(getSuffix(prefix, node), node);
+            return checkPrefix(getSuffix(prefix, node.prefix.length()), node);
         }
         return false;
     }

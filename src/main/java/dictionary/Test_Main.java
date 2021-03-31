@@ -4,11 +4,17 @@ public class Test_Main {
 
     public static void main(String[] args) {
         CompactPrefixTree tree = new CompactPrefixTree();
-//        Node root = new Node();
-//        root.prefix = "ca";
-//        root.isWord = false;
-//        String car = "car";
-//        System.out.println(car.toLowerCase().startsWith(root.prefix));
-//        System.out.println(car.substring(root.prefix.length()));
+
+        System.out.println(tree.getSuffix("cat", 1));
+        //tree.add("cat");
+
+//        tree.add("ape");
+//        tree.add("apple");
+//        tree.add("cart");
+//        tree.add("cats");
+//        tree.add("cat");
+//        tree.add("demon");
+//        tree.add("dog");
+//        tree.add("demons");
     }
 }
