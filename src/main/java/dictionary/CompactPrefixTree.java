@@ -141,40 +141,54 @@ public class CompactPrefixTree implements Dictionary {
         // ap and apple
         // we don't need to create a new node
         // isWord set to true
-        Node newNode = new Node();
-        newNode.prefix = longestCommonPrefix(s, node);
 
+        String lcp = longestCommonPrefix(s, node);
+        if (lcp.equals(node.prefix) && getSuffix(s, lcp.length()).equals("")) {
+            node.isWord = true;
+            //String suffixWord = getSuffix(s, node.prefix.length());
+
+            return node;
+        }
+
+
+
+        Node newNode = new Node();
+        newNode.prefix = lcp;
+        if (newNode.prefix.equals(node.prefix)) { //TODO: boolean train inserting training
+            newNode.isWord = true;
+        }
         // Let suffix and suffixWord be the suffix of the original prefix
         // and the suffix of the word you are adding,
         // after extracting the common prefix.
-        String suffix = getSuffix(newNode.prefix, newNode.prefix.length());
+        String suffix = getSuffix(node.prefix, lcp.length());
         String suffixWord = getSuffix(s, newNode.prefix.length());
 
         // Set the prefix of the original tree to suffix,
+        node.prefix = suffix;
+
         // and set the child of the new node corresponding
         // to the first letter of suffix to the original tree
-        node.prefix = suffix;
-        newNode.children[getIndex(String.valueOf(suffix.charAt(0)))] = node;
+        if (!suffix.equals("")) {
+            int indexSuffix = getIndex(String.valueOf(suffix.charAt(0)));
+            newNode.children[indexSuffix] = node;
+        }
 
         // Recursively insert suffixWord into the
         // appropriate child of the new node o
         // Return the new node
-
-        newNode.children[getIndex(String.valueOf(suffixWord.charAt(0)))] =
-                add(suffixWord, newNode.children[getIndex(String.valueOf(suffixWord.charAt(0)))]);
+        int indexSuffixWord = getIndex(String.valueOf(suffixWord.charAt(0)));
+        newNode.children[indexSuffixWord] = add(suffixWord, newNode.children[indexSuffixWord]);
         // set the child of the newNode to return value of add
         return newNode;
     }
-
-    // TODO: test
 
     public String longestCommonPrefix (String s, Node n) {
         if (n.prefix.equals("")) {
             return "";
         }
-
+        int length = (Math.min(s.length(), n.prefix.length()));
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < s.length(); i++) {
+        for (int i = 0; i < length; i++) {
             if (s.charAt(i) == n.prefix.charAt(i)) {
                 sb.append(s.charAt(i));
             } else {
@@ -224,7 +238,7 @@ public class CompactPrefixTree implements Dictionary {
      * @param idx int beginning index of the substring
      * @return suffix of the input string
      */
-    public String getSuffix (String pref, int idx) {
+    private String getSuffix (String pref, int idx) {
         return pref.substring(idx);
     }
 
@@ -299,6 +313,7 @@ public class CompactPrefixTree implements Dictionary {
         Node(boolean valid, String pref) {
             isWord = valid;
             prefix = pref;
+            children = new Node[26];
         }
 
         // FILL IN CODE: Add other methods to class Node as needed
