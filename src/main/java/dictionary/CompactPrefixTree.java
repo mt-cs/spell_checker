@@ -112,30 +112,30 @@ public class CompactPrefixTree implements Dictionary {
      * @return a reference to the root of the tree that contains s
      */
     private Node add(String s, Node node) {
-        // TODO: do insert first
         // Base case 1: empty tree
-        // create a new node whose prefix is the word s and isWord true, return this node
         if (node == null) {
             Node root = new Node(true, s);
             return root;
         }
 
         // A node whose prefix is the same as the word you are looking for,
+        // e.g. node.prefix = ape and word = ape
         if (node.prefix.equals(s)) {
             // with the valid bit set to false. Set this bit to true, and return the tree.
             if (!node.isWord) {
                 node.isWord = true;
             }
-            //with the valid bit set to false. The word is already in the tree! Return the tree unchanged.
+            // The word is already in the tree! Return the tree unchanged.
             return node;
         }
         //A node whose prefix is not the prefix of the word you are looking for.
-        // This is the hard case. Example: if you were inserting "hamster"
+        // Example: if you were inserting "hamster"
         // into a node whose prefix was "hamburger". You need to:
 
         // Create a new node.
         // The prefix stored in this node is the longest common prefix of the word you are inserting
         // and the prefix stored at the original root.
+
         // TODO: Don't create a new node everytime
         // if  LCP is == node.prefix and the suffix is empty
         // ap and apple
@@ -143,23 +143,22 @@ public class CompactPrefixTree implements Dictionary {
         // isWord set to true
         String lcp = longestCommonPrefix(s, node);
         if (lcp.equals(node.prefix)) {
-            node.isWord = true;
             if (!getSuffix(s, lcp.length()).equals("")){
                 String suffixWord = getSuffix(s, node.prefix.length());
                 int indexSuffixWord = getIndex(String.valueOf(suffixWord.charAt(0)));
                 if (node.children[indexSuffixWord] == null) {
                     Node newNode = new Node(true, suffixWord);
                     node.children[indexSuffixWord] = newNode;
+                    return node;
                 }
+            } else {
+                node.isWord = true;
+                return node;
             }
-            return node;
         }
 
         Node newNode = new Node();
         newNode.prefix = lcp;
-        // Let suffix and suffixWord be the suffix of the original prefix
-        // and the suffix of the word you are adding,
-        // after extracting the common prefix.
         String suffix = getSuffix(node.prefix, lcp.length());
         String suffixWord = getSuffix(s, newNode.prefix.length());
 
