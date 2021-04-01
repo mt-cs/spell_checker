@@ -141,22 +141,22 @@ public class CompactPrefixTree implements Dictionary {
         // ap and apple
         // we don't need to create a new node
         // isWord set to true
-
         String lcp = longestCommonPrefix(s, node);
-        if (lcp.equals(node.prefix) && getSuffix(s, lcp.length()).equals("")) {
+        if (lcp.equals(node.prefix)) {
             node.isWord = true;
-            //String suffixWord = getSuffix(s, node.prefix.length());
-
+            if (!getSuffix(s, lcp.length()).equals("")){
+                String suffixWord = getSuffix(s, node.prefix.length());
+                int indexSuffixWord = getIndex(String.valueOf(suffixWord.charAt(0)));
+                if (node.children[indexSuffixWord] == null) {
+                    Node newNode = new Node(true, suffixWord);
+                    node.children[indexSuffixWord] = newNode;
+                }
+            }
             return node;
         }
 
-
-
         Node newNode = new Node();
         newNode.prefix = lcp;
-        if (newNode.prefix.equals(node.prefix)) { //TODO: boolean train inserting training
-            newNode.isWord = true;
-        }
         // Let suffix and suffixWord be the suffix of the original prefix
         // and the suffix of the word you are adding,
         // after extracting the common prefix.
