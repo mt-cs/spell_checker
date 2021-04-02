@@ -143,10 +143,8 @@ public class CompactPrefixTree implements Dictionary {
                node.isWord = true;
                return node;
             }
-            if (lcp.equals("")) {
-                node.children[indexSuffixWord] = add(s, node.children[indexSuffixWord]);
-                return node;
-            }
+            node.children[indexSuffixWord] = add(suffixWord, node.children[indexSuffixWord]);
+            return node;
         }
 
         Node newNode = new Node();
