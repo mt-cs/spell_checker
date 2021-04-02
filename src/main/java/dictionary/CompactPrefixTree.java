@@ -224,32 +224,18 @@ public class CompactPrefixTree implements Dictionary {
      * @return true if the prefix is in the dictionary, false otherwise
      */
     private boolean checkPrefix(String prefix, Node node) {
-        // BASE CASE
-        // If tree is null, return false
         if (node == null) {
             return false;
         }
-        // If prefix of the root starts with P, return true
-        if (node.prefix.startsWith(prefix.toLowerCase())) {
+        if (node.prefix.startsWith(prefix)) {
             return true;
         }
-        // RECURSIVE CASE
-        // if prefix starts with the prefix stored at the root,
-        // remove prefix from P
-        // recursively check the subtree
-
-        // String prefix: cart
-        // Node ca
-        // if prefix of the root starts with p, return true
-        // Make sure you DO NOT iterate over the children but to search in only one child subtree
-        if (prefix.toLowerCase().startsWith(node.prefix)) {
-            return checkPrefix(getSuffix(prefix, node.prefix.length()), node);
+        if (prefix.startsWith(node.prefix)) {
+            String subS = getSuffix(prefix, node.prefix.length());
+            return checkPrefix(subS, node.children[getIndex(subS)]);
         }
         return false;
     }
-
-
-
 
     // Add a private suggest method. Decide which parameters it should have
 
