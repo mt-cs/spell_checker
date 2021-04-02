@@ -77,6 +77,11 @@ public class CompactPrefixTree implements Dictionary {
 
     }
 
+    // You might want to create a private recursive helper method for toString
+    // that takes the node and the number of indentations, and returns the tree  (printed with indentations) in a string.
+    // private String toString(Node node, int numIndentations)
+
+
     /**
      * Return an array of the entries in the dictionary that are as close as possible to
      * the parameter word.  If the word passed in is in the dictionary, then
@@ -125,56 +130,37 @@ public class CompactPrefixTree implements Dictionary {
             if (!node.isWord) {
                 node.isWord = true;
             }
-            // The word is already in the tree! Return the tree unchanged.
             return node;
         }
-        //A node whose prefix is not the prefix of the word you are looking for.
-        // Example: if you were inserting "hamster"
-        // into a node whose prefix was "hamburger". You need to:
 
-        // Create a new node.
-        // The prefix stored in this node is the longest common prefix of the word you are inserting
-        // and the prefix stored at the original root.
-
-        // TODO: Don't create a new node everytime
-        // if  LCP is == node.prefix and the suffix is empty
-        // ap and apple
-        // we don't need to create a new node
-        // isWord set to true
         String lcp = longestCommonPrefix(s, node);
         if (lcp.equals(node.prefix)) {
-            if (!getSuffix(s, lcp.length()).equals("")){
-                String suffixWord = getSuffix(s, node.prefix.length());
-                int indexSuffixWord = getIndex(String.valueOf(suffixWord.charAt(0)));
-                if (node.children[indexSuffixWord] == null) {
-                    Node newNode = new Node(true, suffixWord);
-                    node.children[indexSuffixWord] = newNode;
-                    return node;
-                }
-            } else {
-                node.isWord = true;
+            String suffixWord = getSuffix(s, node.prefix.length());
+            int indexSuffixWord = getIndex(String.valueOf(suffixWord.charAt(0)));
+            if(node.children[indexSuffixWord] == null) {
+               Node newNode = new Node(true, suffixWord);
+               node.children[indexSuffixWord] = newNode;
+               node.isWord = true;
+               return node;
+            }
+            if (lcp.equals("")) {
+                node.children[indexSuffixWord] = add(s, node.children[indexSuffixWord]);
                 return node;
             }
         }
 
         Node newNode = new Node();
         newNode.prefix = lcp;
-        String suffix = getSuffix(node.prefix, lcp.length());
-        String suffixWord = getSuffix(s, newNode.prefix.length());
-
-        // Set the prefix of the original tree to suffix,
+        String suffix = getSuffix(node.prefix, newNode.prefix.length());
         node.prefix = suffix;
-
         // and set the child of the new node corresponding
         // to the first letter of suffix to the original tree
-        if (!suffix.equals("")) {
-            int indexSuffix = getIndex(String.valueOf(suffix.charAt(0)));
-            newNode.children[indexSuffix] = node;
-        }
+        int indexSuffix = getIndex(String.valueOf(suffix.charAt(0)));
 
-        // Recursively insert suffixWord into the
-        // appropriate child of the new node o
+        newNode.children[indexSuffix] = node;
+        // Recursively insert suffixWord into the appropriate child of the new node
         // Return the new node
+        String suffixWord = getSuffix(s, newNode.prefix.length());
         int indexSuffixWord = getIndex(String.valueOf(suffixWord.charAt(0)));
         newNode.children[indexSuffixWord] = add(suffixWord, newNode.children[indexSuffixWord]);
         // set the child of the newNode to return value of add
@@ -283,10 +269,6 @@ public class CompactPrefixTree implements Dictionary {
     }
 
 
-
-    // You might want to create a private recursive helper method for toString
-    // that takes the node and the number of indentations, and returns the tree  (printed with indentations) in a string.
-    // private String toString(Node node, int numIndentations)
 
 
     // Add a private suggest method. Decide which parameters it should have

@@ -9,10 +9,5 @@ public class Test_Main {
         tree.add("training");
         tree.add("bart");
         tree.add("barometer");
-        tree.add("cats");
-        tree.add("cat");
-        tree.add("demon");
-        tree.add("dog");
-        tree.add("demons");
     }
 }
