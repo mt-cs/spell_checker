@@ -117,16 +117,12 @@ public class CompactPrefixTree implements Dictionary {
      * @return a reference to the root of the tree that contains s
      */
     private Node add(String s, Node node) {
-        // Base case 1: empty tree
         if (node == null) {
             Node root = new Node(true, s);
             return root;
         }
 
-        // A node whose prefix is the same as the word you are looking for,
-        // e.g. node.prefix = ape and word = ape
         if (node.prefix.equals(s)) {
-            // with the valid bit set to false. Set this bit to true, and return the tree.
             if (!node.isWord) {
                 node.isWord = true;
             }
@@ -137,12 +133,6 @@ public class CompactPrefixTree implements Dictionary {
         if (lcp.equals(node.prefix)) {
             String suffixWord = getSuffix(s, node.prefix.length());
             int indexSuffixWord = getIndex(String.valueOf(suffixWord.charAt(0)));
-            if(node.children[indexSuffixWord] == null) {
-               Node newNode = new Node(true, suffixWord);
-               node.children[indexSuffixWord] = newNode;
-               node.isWord = true;
-               return node;
-            }
             node.children[indexSuffixWord] = add(suffixWord, node.children[indexSuffixWord]);
             return node;
         }
@@ -151,17 +141,12 @@ public class CompactPrefixTree implements Dictionary {
         newNode.prefix = lcp;
         String suffix = getSuffix(node.prefix, newNode.prefix.length());
         node.prefix = suffix;
-        // and set the child of the new node corresponding
-        // to the first letter of suffix to the original tree
         int indexSuffix = getIndex(String.valueOf(suffix.charAt(0)));
 
         newNode.children[indexSuffix] = node;
-        // Recursively insert suffixWord into the appropriate child of the new node
-        // Return the new node
         String suffixWord = getSuffix(s, newNode.prefix.length());
         int indexSuffixWord = getIndex(String.valueOf(suffixWord.charAt(0)));
         newNode.children[indexSuffixWord] = add(suffixWord, newNode.children[indexSuffixWord]);
-        // set the child of the newNode to return value of add
         return newNode;
     }
 
