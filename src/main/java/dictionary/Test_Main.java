@@ -11,5 +11,15 @@ public class Test_Main {
         tree.add("bus");
         tree.add("bar");
         tree.add("buses");
+        tree.add("business");
+        tree.add("busy");
+        tree.add("ball");
+
+        System.out.println("Check 'train', expected true, result: " + tree.check("train"));
+        System.out.println("Check 'cat', expected false, result: " + tree.check("cat"));
+        System.out.println("Check 'busy', expected true, result: " + tree.check("busy"));
+        System.out.println("Check 'training', expected true, result: " + tree.check("training"));
+        System.out.println("Check 'cow', expected false, result: " + tree.check("cow"));
+        System.out.println("Check 'bart', expected true, result: " + tree.check("bart"));
     }
 }

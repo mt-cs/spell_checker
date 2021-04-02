@@ -71,7 +71,7 @@ public class CompactPrefixTree implements Dictionary {
      * @param filename the name of the file where to output the tree
      */
     public void printTree(String filename) {
-        // FILL IN CODE
+        // FILL IN CODE 1:11:04
         // Uses toString() method; outputs info to a file
 
 
@@ -129,7 +129,7 @@ public class CompactPrefixTree implements Dictionary {
             return node;
         }
 
-        String lcp = longestCommonPrefix(s, node);
+        String lcp = longestCommonPrefix(s, node.prefix);
         if (lcp.equals(node.prefix)) {
             String suffixWord = getSuffix(s, node.prefix.length());
             int indexSuffixWord = getIndex(String.valueOf(suffixWord.charAt(0)));
@@ -141,23 +141,28 @@ public class CompactPrefixTree implements Dictionary {
         newNode.prefix = lcp;
         String suffix = getSuffix(node.prefix, newNode.prefix.length());
         node.prefix = suffix;
-        int indexSuffix = getIndex(String.valueOf(suffix.charAt(0)));
+        newNode.children[getIndex(String.valueOf(suffix.charAt(0)))] = node;
 
-        newNode.children[indexSuffix] = node;
         String suffixWord = getSuffix(s, newNode.prefix.length());
         int indexSuffixWord = getIndex(String.valueOf(suffixWord.charAt(0)));
         newNode.children[indexSuffixWord] = add(suffixWord, newNode.children[indexSuffixWord]);
         return newNode;
     }
 
-    public String longestCommonPrefix (String s, Node n) {
-        if (n.prefix.equals("")) {
+    /**
+     * a helper method to find the longest common prefix
+     * @param s word
+     * @param n node.prefix
+     * @return string longest common prefix between the two
+     */
+    private String longestCommonPrefix (String s, String n) {
+        if (n.equals("")) {
             return "";
         }
-        int length = (Math.min(s.length(), n.prefix.length()));
+        int length = (Math.min(s.length(), n.length()));
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < length; i++) {
-            if (s.charAt(i) == n.prefix.charAt(i)) {
+            if (s.charAt(i) == n.charAt(i)) {
                 sb.append(s.charAt(i));
             } else {
                 break;
@@ -166,7 +171,6 @@ public class CompactPrefixTree implements Dictionary {
         return sb.toString();
     }
 
-
     /** A private method to check whether a given string is stored in the tree.
      *
      * @param s the string to check
@@ -174,28 +178,21 @@ public class CompactPrefixTree implements Dictionary {
      * @return true if the prefix is in the dictionary, false otherwise
      */
     private boolean check(String s, Node node) {
-        // FILL IN CODE
-        // Base Cases: If the tree is empty, return false
         if (node == null) {
             return false;
         }
-
-        // If word does not start with the prefix stored at the root, return false
-        if (!s.toLowerCase().startsWith(node.prefix)) {
+        if (!s.startsWith(node.prefix)) {
             return false;
-        } else if (s.toLowerCase().startsWith(node.prefix)){ // word = prefix stored at the root
+        }
+        if (s.equals(node.prefix)) {
             if (!node.isWord) {
                 return false;
             } else {
-                return true; // the word is in the tree
+                return true;
             }
         }
-        //Recursive Case:
-        //the prefix stored at the root of the tree is a proper prefix of the word we are looking for
-        String subS = getSuffix(s.toLowerCase(), node.prefix.length());
-//        char first = subS.charAt(0);
-//        int index = first - 'a';
-        return checkPrefix(subS, node.children[getIndex(subS)]);
+        String subS = getSuffix(s, node.prefix.length());
+        return check(subS, node.children[getIndex(subS)]);
     }
 
     /**
