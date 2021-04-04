@@ -28,5 +28,8 @@ public class Test_Main {
         System.out.println("Check Prefix 'ar', expected false, result: " + tree.checkPrefix("ar"));
         System.out.println(tree.toString());
         tree.printTree("output.txt");
+
+        CompactPrefixTree tree_file = new CompactPrefixTree("small_file.txt");
+        System.out.println(tree_file.toString());
     }
 }

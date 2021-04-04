@@ -1,5 +1,7 @@
 package dictionary;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,8 +28,14 @@ public class CompactPrefixTree implements Dictionary {
     public CompactPrefixTree(String filename) {
         // FILL IN CODE:
         // Read each word from the file, add it to the tree
-
-
+        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+            String s;
+            while ((s = br.readLine()) != null) {
+                add(s);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /** Adds a given word to the dictionary.
@@ -126,9 +134,6 @@ public class CompactPrefixTree implements Dictionary {
             e.printStackTrace();
         }
     }
-
-
-
 
     /**
      * Return an array of the entries in the dictionary that are as close as possible to
