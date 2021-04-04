@@ -1,3 +1,7 @@
 ace
-aced
-acedia
+cat
+aces
+caterpillar
+cow
+bat
+dog

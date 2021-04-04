@@ -170,22 +170,29 @@ public class CompactPrefixTree implements Dictionary {
             // send task to helper, get suggestions list
             // check length of the list, if it's not enough, add my own suggestions
             // keep track the number of suggestions, the moment you have enough, you can return
-            String childRoot = this.root.children[getIndex(String.valueOf(word.charAt(0)))].prefix;
-            String lcp = longestCommonPrefix(word, childRoot);
-            String suffixWord = getSuffix(word, childRoot.length());
+            Node childRoot = findRoot(word, this.root);
+            String lcp = longestCommonPrefix(word, childRoot.prefix);
             return new String[] { lcp };
-
-
         }
         //return null;
     }
 
 
     private Node findRoot (String word, Node curNode) {
-        String childRoot = curNode.children[getIndex(String.valueOf(word.charAt(0)))].prefix;
-        String lcp = longestCommonPrefix(word, childRoot);
-        String suffixWord = getSuffix(word, childRoot.length());
-        return findRoot(suffixWord, curNode.children[getIndex(String.valueOf(suffixWord.charAt(0)))]);
+        if (curNode == null) {
+            return null;
+        }
+        Node childRoot = curNode.children[getIndex(String.valueOf(word.charAt(0)))];
+        if (childRoot != null) {
+            String lcp = longestCommonPrefix(word, childRoot.prefix);
+            if (checkPrefix(lcp)){
+                String suffixWord = getSuffix(word, lcp.length());
+                int index = getIndex(String.valueOf(suffixWord.charAt(0)));
+                childRoot = childRoot.children[index];
+                return findRoot(suffixWord, childRoot);
+            }
+        }
+        return curNode;
     }
     // ---------- Private helper methods ---------------
     // Add a private suggest method. Decide which parameters it should have
@@ -344,6 +351,10 @@ public class CompactPrefixTree implements Dictionary {
             isWord = valid;
             prefix = pref;
             children = new Node[26];
+        }
+
+        public String getPrefix() {
+            return prefix;
         }
     }
 
