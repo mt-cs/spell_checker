@@ -63,11 +63,7 @@ public class CompactPrefixTree implements Dictionary {
      */
     public String toString() {
         return toString(this.root, 0);
-        //asterisk means valid word
-        // sb append root + child + child of child
-        // add myself + my own prefix + My child for all my children recursively call the method with num indent + 1
     }
-
 
     /**
      * a private recursive helper method for toString
@@ -77,33 +73,12 @@ public class CompactPrefixTree implements Dictionary {
      * @return String
      */
     private String toString(Node node, int numIndentations) {
-        // for loop iterate through the children
-        // keep appending the children recursively
-        // child indentation = parent indent + 1
-        // contains ca +  return value of children
-        // rt indentation + 1
-        // t + 1 indentation + t child (call recursively with two indentation)
-        // the parent is the one that is trying to connect everything
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < numIndentations; i++) {
-            sb.append(" ");
-        }
-        sb.append(node.prefix);
-        if (node.isWord) {
-            sb.append("*");
-        }
-        sb.append("\n");
+        buildWord(node, numIndentations, sb);
         for (Node n: node.children) {
             if (n != null) {
                 numIndentations++;
-                for (int i = 0; i < numIndentations; i++) {
-                    sb.append(" ");
-                }
-                sb.append(n.prefix);
-                if (n.isWord) {
-                    sb.append("*");
-                }
-                sb.append("\n");
+                buildWord(n, numIndentations, sb);
                 for (int i = 0; i < n.children.length; i++) {
                     if (n.children[i] != null) {
                         numIndentations++;
@@ -115,6 +90,15 @@ public class CompactPrefixTree implements Dictionary {
             }
         }
         return sb.toString();
+    }
+
+    private void buildWord(Node node, int numIndentations, StringBuilder sb) {
+        sb.append(" ".repeat(Math.max(0, numIndentations)));
+        sb.append(node.prefix);
+        if (node.isWord) {
+            sb.append("*");
+        }
+        sb.append("\n");
     }
 
     /**
