@@ -1,5 +1,8 @@
 package dictionary;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Locale;
 
 /** CompactPrefixTree class, implements Dictionary ADT and
@@ -53,15 +56,64 @@ public class CompactPrefixTree implements Dictionary {
 
     /**
      * Returns a human-readable string representation of the compact prefix tree;
-     * contains nodes listed using pre-order traversal and uses indentations to show the level of the node.
+     * contains nodes listed using pre-order traversal (root - left - right) and uses indentations to show the level of the node.
      * An asterisk after the node means the node's boolean flag is set to true.
      * The root is at the current indentation level (followed by * if the node's valid bit is set to true),
      * then there are children of the node at a higher indentation level.
      */
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        // FILL IN CODE
+        return toString(this.root, 0);
+        //asterisk means valid word
+        // sb append root + child + child of child
+        // add myself + my own prefix + My child for all my children recursively call the method with num indent + 1
+    }
 
+
+    /**
+     * a private recursive helper method for toString
+     * that takes the node and the number of indentations, and returns the tree
+     * @param node Tree Node
+     * @param numIndentations the number of indentations
+     * @return String
+     */
+    private String toString(Node node, int numIndentations) {
+        // for loop iterate through the children
+        // keep appending the children recursively
+        // child indentation = parent indent + 1
+        // contains ca +  return value of children
+        // rt indentation + 1
+        // t + 1 indentation + t child (call recursively with two indentation)
+        // the parent is the one that is trying to connect everything
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < numIndentations; i++) {
+            sb.append(" ");
+        }
+        sb.append(node.prefix);
+        if (node.isWord) {
+            sb.append("*");
+        }
+        sb.append("\n");
+        for (Node n: node.children) {
+            if (n != null) {
+                numIndentations++;
+                for (int i = 0; i < numIndentations; i++) {
+                    sb.append(" ");
+                }
+                sb.append(n.prefix);
+                if (n.isWord) {
+                    sb.append("*");
+                }
+                sb.append("\n");
+                for (int i = 0; i < n.children.length; i++) {
+                    if (n.children[i] != null) {
+                        numIndentations++;
+                        sb.append(toString(n.children[i], numIndentations));
+                        numIndentations--;
+                    }
+                }
+                numIndentations--;
+            }
+        }
         return sb.toString();
     }
 
@@ -72,14 +124,11 @@ public class CompactPrefixTree implements Dictionary {
      */
     public void printTree(String filename) {
         // FILL IN CODE 1:11:04
-        // Uses toString() method; outputs info to a file
-
+        // Uses toString() method; outputs info to a file;
 
     }
 
-    // You might want to create a private recursive helper method for toString
-    // that takes the node and the number of indentations, and returns the tree  (printed with indentations) in a string.
-    // private String toString(Node node, int numIndentations)
+
 
 
     /**
@@ -102,13 +151,23 @@ public class CompactPrefixTree implements Dictionary {
         // FILL IN CODE
         // Note: you need to create a private suggest method in this class
         // (like we did for methods add, check, checkPrefix)
-
-
-        return null; // don't forget to change it
+        // find lcp
+        // travel to the right node
+        // then helper method get the children
+        // find closest
+        //return suggest(this.root);
+        return null;
     }
 
-    // ---------- Private helper methods ---------------
 
+
+    // ---------- Private helper methods ---------------
+    // Add a private suggest method. Decide which parameters it should have
+    // A helper function, given the node, get all the valid word in the children --> you can use the helper function
+    private ArrayList<String> suggest(Node root, int numSuggestions) {
+        ArrayList<String> suggestions = new ArrayList<>();
+        return suggestions;
+    }
     /**
      * A private add method that adds a given string to the tree
      * @param s the string to add
@@ -236,8 +295,6 @@ public class CompactPrefixTree implements Dictionary {
         }
         return false;
     }
-
-    // Add a private suggest method. Decide which parameters it should have
 
     // --------- Private class Node ------------
     // Represents a node in a compact prefix tree
