@@ -1,5 +1,7 @@
 package dictionary;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -92,6 +94,12 @@ public class CompactPrefixTree implements Dictionary {
         return sb.toString();
     }
 
+    /**
+     * a helper method to insert indentation and asterisk
+     * @param node current node
+     * @param numIndentations number of indentation
+     * @param sb string builder
+     */
     private void buildWord(Node node, int numIndentations, StringBuilder sb) {
         sb.append(" ".repeat(Math.max(0, numIndentations)));
         sb.append(node.prefix);
@@ -107,9 +115,16 @@ public class CompactPrefixTree implements Dictionary {
      * @param filename the name of the file where to output the tree
      */
     public void printTree(String filename) {
-        // FILL IN CODE 1:11:04
-        // Uses toString() method; outputs info to a file;
-
+        String s = toString();
+        try {
+            FileWriter myWriter = new FileWriter(filename);
+            myWriter.write(s);
+            myWriter.close();
+            System.out.println("Successfully wrote to the file.");
+        } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 
 

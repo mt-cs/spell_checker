@@ -27,5 +27,6 @@ public class Test_Main {
         System.out.println("Check Prefix 'c', expected false, result: " + tree.checkPrefix("c"));
         System.out.println("Check Prefix 'ar', expected false, result: " + tree.checkPrefix("ar"));
         System.out.println(tree.toString());
+        tree.printTree("output.txt");
     }
 }
