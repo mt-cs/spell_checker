@@ -5,9 +5,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Locale;
+
 
 /** CompactPrefixTree class, implements Dictionary ADT and
  *  several additional methods. Can be used as a spell checker.
@@ -241,18 +239,10 @@ public class CompactPrefixTree implements Dictionary {
      * @return true if the prefix is in the dictionary, false otherwise
      */
     private boolean check(String s, Node node) {
-        if (node == null) {
-            return false;
-        }
-        if (!s.startsWith(node.prefix)) {
-            return false;
-        }
+        if (node == null) return false;
+        if (!s.startsWith(node.prefix)) return false;
         if (s.equals(node.prefix)) {
-            if (!node.isWord) {
-                return false;
-            } else {
-                return true;
-            }
+            return node.isWord;
         }
         String subS = getSuffix(s, node.prefix.length());
         return check(subS, node.children[getIndex(subS)]);
@@ -304,7 +294,7 @@ public class CompactPrefixTree implements Dictionary {
     // Represents a node in a compact prefix tree
     class Node {
         String prefix; // prefix stored in the node
-        Node children[]; // array of children (26 children)
+        Node[] children; // array of children (26 children)
         boolean isWord; // true if by concatenating all prefixes on the path from the root to this node, we get a valid word
 
         Node() {
