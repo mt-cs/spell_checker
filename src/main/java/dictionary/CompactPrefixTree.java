@@ -82,11 +82,11 @@ public class CompactPrefixTree implements Dictionary {
      */
     private String toString(Node node, int numIndentations) {
         StringBuilder sb = new StringBuilder();
-        buildWord(node, numIndentations, sb);
+        buildString(node, numIndentations, sb);
         for (Node n: node.children) {
             if (n != null) {
                 numIndentations++;
-                buildWord(n, numIndentations, sb);
+                buildString(n, numIndentations, sb);
                 for (int i = 0; i < n.children.length; i++) {
                     if (n.children[i] != null) {
                         numIndentations++;
@@ -106,7 +106,7 @@ public class CompactPrefixTree implements Dictionary {
      * @param numIndentations number of indentation
      * @param sb string builder
      */
-    private void buildWord(Node node, int numIndentations, StringBuilder sb) {
+    private void buildString(Node node, int numIndentations, StringBuilder sb) {
         sb.append(" ".repeat(Math.max(0, numIndentations)));
         sb.append(node.prefix);
         if (node.isWord) {
@@ -153,21 +153,53 @@ public class CompactPrefixTree implements Dictionary {
         // FILL IN CODE
         // Note: you need to create a private suggest method in this class
         // (like we did for methods add, check, checkPrefix)
-        // find lcp
+
         // travel to the right node
         // then helper method get the children
         // find closest
-        //return suggest(this.root);
-        return null;
+        // return suggest(this.root);
+
+        if (check(word)) {
+            return new String[] { word };
+        } else {
+            // find lcp, the lcp doesn't have to be in a single node e.g word is car, dictionary has cart
+            // go to the child that starts with the word e.g. go to child c
+            // get the suffix e.g. remove ca from car, we get r
+            // go down until we find the word that doesn't match e.g. go to the r child, here we have rt, lcp is r, but rt is longer so we stop
+
+            // send task to helper, get suggestions list
+            // check length of the list, if it's not enough, add my own suggestions
+            // keep track the number of suggestions, the moment you have enough, you can return
+            String childRoot = this.root.children[getIndex(String.valueOf(word.charAt(0)))].prefix;
+            String lcp = longestCommonPrefix(word, childRoot);
+            String suffixWord = getSuffix(word, childRoot.length());
+            return new String[] { lcp };
+
+
+        }
+        //return null;
     }
 
 
-
+    private Node findRoot (String word, Node curNode) {
+        String childRoot = curNode.children[getIndex(String.valueOf(word.charAt(0)))].prefix;
+        String lcp = longestCommonPrefix(word, childRoot);
+        String suffixWord = getSuffix(word, childRoot.length());
+        return findRoot(suffixWord, curNode.children[getIndex(String.valueOf(suffixWord.charAt(0)))]);
+    }
     // ---------- Private helper methods ---------------
     // Add a private suggest method. Decide which parameters it should have
     // A helper function, given the node, get all the valid word in the children --> you can use the helper function
     private ArrayList<String> suggest(Node root, int numSuggestions) {
         ArrayList<String> suggestions = new ArrayList<>();
+        // find the parent
+        // create a helper method that get all the children
+        // loop through each children and get the lcp
+        // return word with the longest lcp
+        // Bryan: build suggestions otw back up
+        // it also depends on the number of suggestions
+        // if the numSuggestions > numChildren, go to the root after and get a word, we go left, right, underneath
+
         return suggestions;
     }
     /**
@@ -300,7 +332,7 @@ public class CompactPrefixTree implements Dictionary {
         Node() {
             isWord = false;
             prefix = "";
-            children = new Node[26]; // initialize the array of children
+            children = new Node[26];
         }
 
         /**
@@ -313,8 +345,6 @@ public class CompactPrefixTree implements Dictionary {
             prefix = pref;
             children = new Node[26];
         }
-
-        // FILL IN CODE: Add other methods to class Node as needed
     }
 
 }
