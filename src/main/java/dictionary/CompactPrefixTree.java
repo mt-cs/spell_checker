@@ -40,7 +40,9 @@ public class CompactPrefixTree implements Dictionary {
      * @param word the word to add to the dictionary
      */
     public void add(String word) {
-        root = add(word.toLowerCase(), root); // Calling private add method
+        if (!check(word)) {
+            root = add(word.toLowerCase(), root); // Calling private add method
+        }
     }
 
     /**
@@ -167,12 +169,21 @@ public class CompactPrefixTree implements Dictionary {
             // get the suffix e.g. remove ca from car, we get r
             // go down until we find the word that doesn't match e.g. go to the r child, here we have rt, lcp is r, but rt is longer so we stop
 
-            // send task to helper, get suggestions list
-            // check length of the list, if it's not enough, add my own suggestions
-            // keep track the number of suggestions, the moment you have enough, you can return
             Node childRoot = findRoot(word, this.root);
-            String lcp = longestCommonPrefix(word, childRoot.prefix);
-            return new String[] { lcp };
+
+            // send task to helper, get suggestions list
+            ArrayList<String> childSuggest = suggest(childRoot, numSuggestions);
+            //String[] suggestArr = childSuggest.toArray(new String[childSuggest.size()]);
+            String[] suggestArr = new String[numSuggestions];
+            //if (numSuggestions <= suggestArr.length) {
+                for (int i = 0; i < numSuggestions; i++) {
+                    suggestArr[i] = word.charAt(0) + childSuggest.get(i); //TODO: how to get word
+                }
+            //}
+
+            //TODO:  check length of the list, if it's not enough, add my own suggestions
+            // keep track the number of suggestions, the moment you have enough, you can return
+            return suggestArr;
         }
         //return null;
     }
@@ -194,21 +205,57 @@ public class CompactPrefixTree implements Dictionary {
         }
         return curNode;
     }
+
+
+
     // ---------- Private helper methods ---------------
     // Add a private suggest method. Decide which parameters it should have
     // A helper function, given the node, get all the valid word in the children --> you can use the helper function
     private ArrayList<String> suggest(Node root, int numSuggestions) {
         ArrayList<String> suggestions = new ArrayList<>();
-        // find the parent
-        // create a helper method that get all the children
-        // loop through each children and get the lcp
-        // return word with the longest lcp
-        // Bryan: build suggestions otw back up
-        // it also depends on the number of suggestions
-        // if the numSuggestions > numChildren, go to the root after and get a word, we go left, right, underneath
+        for(int i = 0; i < root.children.length; i++) {
+            if (root.children[i] != null) {
+                if (root.children[i].isWord) {
+                    suggestions.add(root.prefix + root.children[i].prefix);
+                    // if child[i] has children let's get it
+                    if (getChildren(root.children[i]) != null) {
+                        suggestions.add(root.prefix + root.children[i].prefix + getChildren(root.children[i]));
+                    }
+                } // TODO: how to call it recursively and get the children of r
+            }
 
+        }
         return suggestions;
     }
+    // find the parent
+    // create a helper method that get all the children
+    // loop through each children and get the lcp
+    // return word with the longest lcp
+    // Bryan: build suggestions otw back up
+    // it also depends on the number of suggestions
+    // if the numSuggestions > numChildren, go to the root after and get a word, we go left, right, underneath
+    private String getChildren(Node root) { // prefix so far, arrayList
+        for(int i = 0; i < root.children.length; i++) {
+            if (root.children[i] != null && root.children[i].isWord) {
+                return root.prefix + root.children[i].prefix;
+            }
+        }
+        return null;
+    }
+
+    /*
+    * For example ca
+    * Iterate over the children, pass in ca
+    * check if word isTrue
+    * return type void
+    * Recursively call through rt, pass in ca rt
+    * base case tree is null
+    * if flag is true then add yourself
+    *
+    * call getChildren after lcp
+    * */
+
+
     /**
      * A private add method that adds a given string to the tree
      * @param s the string to add
@@ -218,8 +265,7 @@ public class CompactPrefixTree implements Dictionary {
      */
     private Node add(String s, Node node) {
         if (node == null) {
-            Node root = new Node(true, s);
-            return root;
+            return new Node(true, s);
         }
 
         if (node.prefix.equals(s)) {
@@ -352,10 +398,5 @@ public class CompactPrefixTree implements Dictionary {
             prefix = pref;
             children = new Node[26];
         }
-
-        public String getPrefix() {
-            return prefix;
-        }
     }
-
 }

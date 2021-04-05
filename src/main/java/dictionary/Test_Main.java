@@ -31,7 +31,7 @@ public class Test_Main {
         System.out.println(tree.toString());
         tree.printTree("output.txt");
         System.out.println("Suggestion for train: " + Arrays.toString(tree.suggest("train", 1)) + "\n");
-        System.out.println("Suggestion for ba: " + Arrays.toString(tree.suggest("ba", 1)) + "\n");
+        System.out.println("Suggestion for bald: " + Arrays.toString(tree.suggest("bald", 3)) + "\n");
 
         CompactPrefixTree tree_file = new CompactPrefixTree("small_file.txt");
         System.out.println(tree_file.toString());
