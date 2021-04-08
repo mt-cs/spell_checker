@@ -150,111 +150,15 @@ public class CompactPrefixTree implements Dictionary {
      * single world.
      * @return An array of the closest entries in the dictionary to the target word
      */
-
     public String[] suggest(String word, int numSuggestions) {
-        // FILL IN CODE
-        // Note: you need to create a private suggest method in this class
-        // (like we did for methods add, check, checkPrefix)
-
-        // travel to the right node
-        // then helper method get the children
-        // find closest
-        // return suggest(this.root);
-
         if (check(word)) {
             return new String[] { word };
         } else {
-            // find lcp, the lcp doesn't have to be in a single node e.g word is car, dictionary has cart
-            // go to the child that starts with the word e.g. go to child c
-            // get the suffix e.g. remove ca from car, we get r
-            // go down until we find the word that doesn't match e.g. go to the r child, here we have rt, lcp is r, but rt is longer so we stop
-
-            Node childRoot = findRoot(word, this.root);
-
-            // send task to helper, get suggestions list
-            ArrayList<String> childSuggest = suggest(childRoot, numSuggestions);
-            //String[] suggestArr = childSuggest.toArray(new String[childSuggest.size()]);
-            String[] suggestArr = new String[numSuggestions];
-            //if (numSuggestions <= suggestArr.length) {
-                for (int i = 0; i < numSuggestions; i++) {
-                    suggestArr[i] = word.charAt(0) + childSuggest.get(i); //TODO: how to get word
-                }
-            //}
-
-            //TODO:  check length of the list, if it's not enough, add my own suggestions
-            // keep track the number of suggestions, the moment you have enough, you can return
-            return suggestArr;
+            ArrayList<String> suggestions = new ArrayList<>();
+            suggest(word, "", this.root, numSuggestions, suggestions);
+            return suggestions.toArray(new String[0]);
         }
-        //return null;
     }
-
-
-    private Node findRoot (String word, Node curNode) {
-        if (curNode == null) {
-            return null;
-        }
-        Node childRoot = curNode.children[getIndex(String.valueOf(word.charAt(0)))];
-        if (childRoot != null) {
-            String lcp = longestCommonPrefix(word, childRoot.prefix);
-            if (checkPrefix(lcp)){
-                String suffixWord = getSuffix(word, lcp.length());
-                int index = getIndex(String.valueOf(suffixWord.charAt(0)));
-                childRoot = childRoot.children[index];
-                return findRoot(suffixWord, childRoot);
-            }
-        }
-        return curNode;
-    }
-
-
-
-    // ---------- Private helper methods ---------------
-    // Add a private suggest method. Decide which parameters it should have
-    // A helper function, given the node, get all the valid word in the children --> you can use the helper function
-    private ArrayList<String> suggest(Node root, int numSuggestions) {
-        ArrayList<String> suggestions = new ArrayList<>();
-        for(int i = 0; i < root.children.length; i++) {
-            if (root.children[i] != null) {
-                if (root.children[i].isWord) {
-                    suggestions.add(root.prefix + root.children[i].prefix);
-                    // if child[i] has children let's get it
-                    if (getChildren(root.children[i]) != null) {
-                        suggestions.add(root.prefix + root.children[i].prefix + getChildren(root.children[i]));
-                    }
-                } // TODO: how to call it recursively and get the children of r
-            }
-
-        }
-        return suggestions;
-    }
-    // find the parent
-    // create a helper method that get all the children
-    // loop through each children and get the lcp
-    // return word with the longest lcp
-    // Bryan: build suggestions otw back up
-    // it also depends on the number of suggestions
-    // if the numSuggestions > numChildren, go to the root after and get a word, we go left, right, underneath
-    private String getChildren(Node root) { // prefix so far, arrayList
-        for(int i = 0; i < root.children.length; i++) {
-            if (root.children[i] != null && root.children[i].isWord) {
-                return root.prefix + root.children[i].prefix;
-            }
-        }
-        return null;
-    }
-
-    /*
-    * For example ca
-    * Iterate over the children, pass in ca
-    * check if word isTrue
-    * return type void
-    * Recursively call through rt, pass in ca rt
-    * base case tree is null
-    * if flag is true then add yourself
-    *
-    * call getChildren after lcp
-    * */
-
 
     /**
      * A private add method that adds a given string to the tree
@@ -274,7 +178,6 @@ public class CompactPrefixTree implements Dictionary {
             }
             return node;
         }
-
         String lcp = longestCommonPrefix(s, node.prefix);
         if (lcp.equals(node.prefix)) {
             String suffixWord = getSuffix(s, node.prefix.length());
@@ -293,6 +196,65 @@ public class CompactPrefixTree implements Dictionary {
         int indexSuffixWord = getIndex(String.valueOf(suffixWord.charAt(0)));
         newNode.children[indexSuffixWord] = add(suffixWord, newNode.children[indexSuffixWord]);
         return newNode;
+    }
+
+    /** A private method to check whether a given string is stored in the tree.
+     *
+     * @param s the string to check
+     * @param node the root of a tree
+     * @return true if the prefix is in the dictionary, false otherwise
+     */
+    private boolean check(String s, Node node) {
+        if (node == null) return false;
+        if (!s.startsWith(node.prefix)) return false;
+        if (s.equals(node.prefix)) {
+            return node.isWord;
+        }
+        String subS = getSuffix(s, node.prefix.length());
+        return check(subS, node.children[getIndex(subS)]);
+    }
+
+    /**
+     * A private recursive method to check whether a given prefix is in the tree
+     *
+     * @param prefix the prefix
+     * @param node the root of the tree
+     * @return true if the prefix is in the dictionary, false otherwise
+     */
+    private boolean checkPrefix(String prefix, Node node) {
+        if (node == null) {
+            return false;
+        }
+        if (node.prefix.startsWith(prefix)) {
+            return true;
+        }
+        if (prefix.startsWith(node.prefix)) {
+            String subS = getSuffix(prefix, node.prefix.length());
+            return checkPrefix(subS, node.children[getIndex(subS)]);
+        }
+        return false;
+    }
+
+    // ---------- Private Helper Methods ------------
+    /**
+     * Get suffix, the portion of the word that is not part of the prefix stored at the root.
+     * So, if the word we are looking for is "green",
+     * and the prefix stored at the root of the tree is "gre", then suffix would be "en"
+     * @param pref String to be searched and suffixed
+     * @param idx int beginning index of the substring
+     * @return suffix of the input string
+     */
+    private String getSuffix (String pref, int idx) {
+        return pref.substring(idx);
+    }
+
+    /**
+     * A helper method to get the index from substring
+     * @param subS sub String
+     * @return integer index
+     */
+    private int getIndex (String subS) {
+        return subS.charAt(0) - 'a';
     }
 
     /**
@@ -317,65 +279,87 @@ public class CompactPrefixTree implements Dictionary {
         return sb.toString();
     }
 
-    /** A private method to check whether a given string is stored in the tree.
-     *
-     * @param s the string to check
-     * @param node the root of a tree
-     * @return true if the prefix is in the dictionary, false otherwise
-     */
-    private boolean check(String s, Node node) {
-        if (node == null) return false;
-        if (!s.startsWith(node.prefix)) return false;
-        if (s.equals(node.prefix)) {
-            return node.isWord;
-        }
-        String subS = getSuffix(s, node.prefix.length());
-        return check(subS, node.children[getIndex(subS)]);
-    }
-
     /**
-     * Get suffix, the portion of the word that is not part of the prefix stored at the root.
-     * So, if the word we are looking for is "green",
-     * and the prefix stored at the root of the tree is "gre", then suffix would be "en"
-     * @param pref String to be searched and suffixed
-     * @param idx int beginning index of the substring
-     * @return suffix of the input string
+     * A helper method that collect all suggestions and append them into an ArrayList
+     * @param word string input
+     * @param currentPrefix current prefix so far
+     * @param node the current node
+     * @param numSuggestions total number of suggestions asked
+     * @param suggestions total number of suggestions asked
      */
-    private String getSuffix (String pref, int idx) {
-        return pref.substring(idx);
-    }
-
-    /**
-     * A helper method to get the index from substring
-     * @param subS sub String
-     * @return integer index
-     */
-    private int getIndex (String subS) {
-        return subS.charAt(0) - 'a';
-    }
-
-    /**
-     * A private recursive method to check whether a given prefix is in the tree
-     *
-     * @param prefix the prefix
-     * @param node the root of the tree
-     * @return true if the prefix is in the dictionary, false otherwise
-     */
-    private boolean checkPrefix(String prefix, Node node) {
+    private void suggest(String word, String currentPrefix, Node node, int numSuggestions, ArrayList<String> suggestions) {
         if (node == null) {
-            return false;
+            return ;
         }
-        if (node.prefix.startsWith(prefix)) {
-            return true;
+        String lcp = longestCommonPrefix(word, node.prefix);
+        String suffixWord = getSuffix(word, node.prefix.length());
+
+        if (lcp.equals(node.prefix) && !suffixWord.equals("")) {
+            int indexSuffixWord = getIndex(String.valueOf(suffixWord.charAt(0)));
+            suggest(suffixWord, currentPrefix + node.prefix, node.children[indexSuffixWord], numSuggestions, suggestions);
+        } else {
+            getChildren(node, currentPrefix + lcp, suggestions, numSuggestions);
+            return;
         }
-        if (prefix.startsWith(node.prefix)) {
-            String subS = getSuffix(prefix, node.prefix.length());
-            return checkPrefix(subS, node.children[getIndex(subS)]);
+
+        if (suggestions.size() < numSuggestions) {
+            for (int i = 0; i < node.children.length; i++) {
+                if (node.children[i] != null) {
+                    if (node.children[i].isWord && suggestions.size() < numSuggestions) {
+                        suggestions.add(currentPrefix + node.prefix + node.children[i].prefix);
+                    }
+                    getChildren(node.children[i], currentPrefix + node.prefix + node.children[i].prefix, suggestions, numSuggestions);
+                }
+            }
         }
-        return false;
     }
 
-    // --------- Private class Node ------------
+    /**
+     * Get children of a current root, break when enough suggestions are collected
+     * @param root the current node
+     * @param currentPrefix current prefix so far
+     * @param suggestions ArrayList of suggestions
+     * @param numSuggest total number of suggestions asked
+     */
+    private void getChildren(Node root, String currentPrefix, ArrayList<String> suggestions, int numSuggest) {
+        if (root == null) {
+            return;
+        }
+        if (suggestions.size() >= numSuggest) {
+            return;
+        }
+        for(int i = 0; i < root.children.length; i++) {
+            if (root.children[i] != null && root.children[i].isWord && suggestions.size() < numSuggest) {
+                suggestions.add(currentPrefix + root.children[i].prefix);
+                getChildren(root.children[i], currentPrefix + root.children[i].prefix, suggestions, numSuggest);
+            }
+        }
+    }
+
+    /**
+     * A helper method to recursively go down and find the root in the tree of lcp
+     * @param word word that we are searching for
+     * @param curNode current node in the tree
+     * @return root Node of lcp
+     */
+    private Node findRoot (String word, Node curNode) {
+        if (curNode == null) {
+            return null;
+        }
+        Node childRoot = curNode.children[getIndex(String.valueOf(word.charAt(0)))];
+        if (childRoot != null) {
+            String lcp = longestCommonPrefix(word, childRoot.prefix);
+            if (checkPrefix(lcp)){
+                String suffixWord = getSuffix(word, lcp.length());
+                int index = getIndex(String.valueOf(suffixWord.charAt(0)));
+                childRoot = childRoot.children[index];
+                return findRoot(suffixWord, childRoot);
+            }
+        }
+        return curNode;
+    }
+
+    // ------------ Private class Node --------------
     // Represents a node in a compact prefix tree
     class Node {
         String prefix; // prefix stored in the node
