@@ -295,6 +295,9 @@ public class CompactPrefixTree implements Dictionary {
         String suffixWord = getSuffix(word, node.prefix.length());
 
         if (lcp.equals(node.prefix) && !suffixWord.equals("")) {
+            if (node.isWord) {
+                suggestions.add(currentPrefix + node.prefix);
+            }
             int indexSuffixWord = getIndex(String.valueOf(suffixWord.charAt(0)));
             suggest(suffixWord, currentPrefix + node.prefix, node.children[indexSuffixWord], numSuggestions, suggestions);
         } else {
