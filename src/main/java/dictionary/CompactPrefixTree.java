@@ -295,7 +295,7 @@ public class CompactPrefixTree implements Dictionary {
         String suffixWord = getSuffix(word, node.prefix.length());
 
         if (lcp.equals(node.prefix) && !suffixWord.equals("")) {
-            if (node.isWord) {
+            if (node.isWord && !suggestions.contains(currentPrefix + node.prefix)) {
                 suggestions.add(currentPrefix + node.prefix);
             }
             int indexSuffixWord = getIndex(String.valueOf(suffixWord.charAt(0)));
@@ -308,7 +308,7 @@ public class CompactPrefixTree implements Dictionary {
         if (suggestions.size() < numSuggestions) {
             for (int i = 0; i < node.children.length; i++) {
                 if (node.children[i] != null) {
-                    if (node.children[i].isWord && suggestions.size() < numSuggestions) {
+                    if (node.children[i].isWord && suggestions.size() < numSuggestions && !suggestions.contains(currentPrefix + node.prefix + node.children[i].prefix)) {
                         suggestions.add(currentPrefix + node.prefix + node.children[i].prefix);
                     }
                     getChildren(node.children[i], currentPrefix + node.prefix + node.children[i].prefix, suggestions, numSuggestions);
