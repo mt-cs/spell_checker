@@ -27,9 +27,9 @@ For example, consider the following tree:
 <img width="852" alt="compact_prefix" src="https://user-images.githubusercontent.com/60201466/119573015-8032e680-bd68-11eb-90d8-db9a93e4efc2.png">
 
 This dictionary structure has three main advantages:
-• The methods add and check can be performed in constant time (with respect to the number of words in the dictionary -- both these operations are linear in the length of the word being added or checked)
-• Suggest can be done (relatively) easily
-• Determining if a string is a valid prefix of some word can be done in constant time (relative to the size of the dictionary)
+   - The methods add and check can be performed in constant time (with respect to the number of words in the dictionary -- both these operations are linear in the length of the word being added or checked)
+   - Suggest can be done (relatively) easily
+   - Determining if a string is a valid prefix of some word can be done in constant time (relative to the size of the dictionary)
 
 ### Program Output
 printTree output a tree (in a human readable form that uses indentations and preorder traversal) to a file. For example, for a tree that contains: car, carted, carts, doge, doges and doghouse, the string should looks like this (the first line contains the prefix of the root which is an empty string):
