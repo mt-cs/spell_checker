@@ -18,10 +18,7 @@ Options:
 ```
 
 ### About Compact Prefix Tree
-Instead of a hash table or a binary search tree, this program uses a compact prefix tree: a tree where each node has:
-• a string prefix
-• up to 26 children (one for each letter of the alphabet),
-• a valid bit,
+Instead of a hash table or a binary search tree, this program uses a compact prefix tree: a tree where each node has a string prefix, up to 26 children (one for each letter of the alphabet), and a valid bit.
 
 For example, consider the following tree:
 <img width="852" alt="compact_prefix" src="https://user-images.githubusercontent.com/60201466/119573015-8032e680-bd68-11eb-90d8-db9a93e4efc2.png">
